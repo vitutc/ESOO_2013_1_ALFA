@@ -64,10 +64,16 @@ class TipoDeExtintor(models.Model):
         verbose_name = "Tipo de Extintor"
         verbose_name_plural = "Tipos de Extintor"
 
+    #Listas
+    MEDIDA = (
+        ("LITRO", "L"),
+        ("KILOGRAMA","Kg")
+    )
+
     #Atributos
     codigo = models.CharField("código", max_length=10, unique=True)
     descricao = models.CharField("descrição", max_length=50)
-    unidade = models.CharField("unidade", max_length=10)
+    unidade = models.CharField("unidade de medida da capacidade", max_length=10, choices=MEDIDA)
 
     #Nome do objeto
     def __unicode__(self):
@@ -88,7 +94,7 @@ class Extintor(models.Model):
     )
 
     #Atributos
-    carcaca = models.DecimalField("número da carcaça", max_digits=10, decimal_places=0, unique=True)
+    carcaca = models.CharField("número da carcaça", max_length=10, blank=True, unique=True)
     codigo = models.DecimalField("código interno", max_digits=4, decimal_places=0, unique=True)
     tipo = models.ForeignKey('TipoDeExtintor', on_delete=models.PROTECT)
     capacidade = models.DecimalField("capacidade", max_digits=6, decimal_places=3)
