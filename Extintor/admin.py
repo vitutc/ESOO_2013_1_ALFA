@@ -1,5 +1,6 @@
 # coding=utf-8
 from django.contrib import admin
+from django.contrib.admin import DateFieldListFilter
 from django.forms import TextInput
 from django.contrib.sites.models import Site
 
@@ -72,7 +73,9 @@ class ExtintorAdmin(admin.ModelAdmin):
                      'localizacao__bloco']
 
     #Exibição de lista
-    list_display = ['carcaca', 'uso', 'codigo', 'get_unidade', 'get_capacidade', 'get_tipo', 'get_localizacao']
+    list_display = ['carcaca', 'uso', 'codigo', 'get_unidade', 'get_capacidade', 'get_tipo', 'get_localizacao', 'data_recarga', 'validade_recarga', 'data_reteste', 'validade_reteste']
+    list_filter = ['uso', ('data_recarga', DateFieldListFilter), ('validade_recarga', DateFieldListFilter),
+                   ('data_reteste', DateFieldListFilter), ('validade_reteste', DateFieldListFilter)]
 
     def get_unidade(self, obj):
         return '%s'%(obj.localizacao.unidade.nome)
@@ -114,6 +117,7 @@ class LocalizacaoAdmin(admin.ModelAdmin):
 
     #Exibição de lista
     list_display = ['get_unidade', 'nome', 'tipo', 'codigo', 'bloco']
+    list_filter = ['tipo','bloco']
 
     def get_unidade(self, obj):
         return '%s'%(obj.unidade.nome)
@@ -152,6 +156,7 @@ class RecargaAdmin(admin.ModelAdmin):
 
     #Exibição de lista
     list_display = ['identificador', 'data_saida', 'get_data_conclusao']
+    list_filter = [('data_saida', DateFieldListFilter), ('recarga_concluida__data_chegada', DateFieldListFilter)]
 
     def get_data_conclusao(self, obj):
         try:
