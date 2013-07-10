@@ -46,6 +46,14 @@ class ExtintorInativoInline(admin.StackedInline):
     verbose_name_plural = 'Desativar extintor'
     inline_classes = ('grp-collapse grp-open')
 
+class RecargaConcluidaInline(admin.StackedInline):
+    model = RecargaConcluida
+    extra = 0
+    max_num = 1
+    verbose_name = 'Informar conclusão de recarga'
+    verbose_name_plural = 'Informar conclusão de recarga'
+    inline_classes = ('grp-collapse grp-open')
+
 class ExtintorAdmin(admin.ModelAdmin):
     inlines = [ExtintorRecargaNecessariaInline, ExtintorEmprestadoInline, ExtintorInativoInline]
     # Criterios de busca:
@@ -119,6 +127,9 @@ class UnidadeOrganizacionalAdmin(admin.ModelAdmin):
 
     search_fields = ['nome', 'responsavel']
 
+    #Exibição de lista
+    list_display = ['nome', 'responsavel', 'telefone']
+
 class TipoDeExtintorAdmin(admin.ModelAdmin):
     # Criterios de busca:
     #   Codigo do Tipo(nome)
@@ -126,12 +137,29 @@ class TipoDeExtintorAdmin(admin.ModelAdmin):
 
     search_fields = ['codigo', 'unidade']
 
+    #Exibição de lista
+    list_display = ['codigo', 'descricao', 'unidade']
+
 class RecargaAdmin(admin.ModelAdmin):
+    #Inlines
+    inlines = [RecargaConcluidaInline]
+
     # Criterios de busca:
     #   Identificador da Recarga
     #   Extintores Contidos na Recarga: Codigo da Carcaca, Tipo de Extintor, Nome da Localizacao do Extintor
 
     search_fields = ['identificador', 'extintores__carcaca', 'extintores__tipo__codigo', 'extintores__localizacao__nome']
+
+    #Exibição de lista
+    list_display = ['identificador', 'data_saida', 'get_data_conclusao']
+
+    def get_data_conclusao(self, obj):
+        try:
+            return '%s'%(obj.recarga_concluida.data_chegada)
+        except:
+            return 'Em andamento.'
+    get_data_conclusao.short_description = 'Data de chegada'
+
 
 class GrupoAdmin(admin.ModelAdmin):
     search_fields = ('name', 'descricao')

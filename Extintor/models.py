@@ -272,10 +272,8 @@ class RecargaConcluida(models.Model):
     #Atributos
     recarga = models.OneToOneField('Recarga', related_name='recarga_concluida', on_delete=models.PROTECT,
                                    help_text="Extintores que foram recarregados.")
-    reteste = models.ManyToManyField('Extintor', related_name='reteste+',
-                                     help_text="Extintores que foram retestados.")
-    perdas = models.ManyToManyField('Extintor', related_name='perdas+',
-                                    help_text="Extintores que foram desativados.")
+    reteste = models.ManyToManyField('Extintor', related_name='reteste+', help_text="Extintores que foram retestados.", blank=True)
+    perdas = models.ManyToManyField('Extintor', related_name='perdas+', help_text="Extintores que foram desativados.", blank=True)
     data_chegada = models.DateField("data de chegada")
     observacoes = models.TextField("observações", max_length=250, blank=True)
 
