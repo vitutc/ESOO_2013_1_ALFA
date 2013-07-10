@@ -95,4 +95,5 @@ admin.site.register(UnidadeOrganizacional, UnidadeOrganizacionalAdmin)
 admin.site.register(Localizacao, LocalizacaoAdmin)
 admin.site.register(TipoDeExtintor, TipoDeExtintorAdmin)
 admin.site.register(Recarga, RecargaAdmin)
+admin.site.register(Usuario)
 #admin.site.register(Permission) #Ativar a linha para editar texto de permissões, depois desativar.

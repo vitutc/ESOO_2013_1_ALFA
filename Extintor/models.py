@@ -1,8 +1,54 @@
 # coding=utf-8
+import re
+
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.utils import timezone
+from django.core import validators
+from django.core.mail import send_mail
+from django.utils.http import urlquote
 
 #Usuário
-##Ver método para 'custom user'.
+class Usuario(AbstractBaseUser, PermissionsMixin):
+    class Meta:
+        #Nome
+        verbose_name = "usuario"
+        verbose_name_plural = "usuários"
+
+    #Atributos
+    username = models.CharField('login', max_length=30, unique=True, help_text="Até 30 caracteres. Pode ser composto por letras, números e os caracteres '@', '.', '+', '-'  e '_'.",
+        validators=[validators.RegexValidator(re.compile('^[\w.@+-]+$'), 'Digite um nome de usuário válido.', 'inválido')])
+    first_name = models.CharField('nome', max_length=50, blank=True, help_text="Até 50 caracteres.")
+    last_name = models.CharField('sobrenome', max_length=50, blank=True, help_text="Até 50 caracteres.")
+    email = models.EmailField('email')
+    is_staff = models.BooleanField('acesso ao sistema', default=False, help_text='Determina se o usuário pode acessar o sistema de gerenciamento de extintores.')
+    is_active = models.BooleanField('ativo', default=True, help_text='Determina se o usuário está ativo.')
+    date_joined = models.DateTimeField('data de cadastro', default=timezone.now)
+    matricula = models.DecimalField("matricula", default=0, max_digits=15, decimal_places=0, blank=True, help_text="Até 15 digitos numéricos.")
+    funcao = models.CharField("função", max_length=50, help_text="Até 50 caracteres.")
+    cpf = models.DecimalField("CPF", max_digits=11, decimal_places=0, help_text="CPF do usuário, somente números.")
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', 'funcao', 'cpf']
+
+    def get_absolute_url(self):
+        return "/users/%s/" % urlquote(self.username)
+
+    def get_full_name(self):
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        return self.first_name
+
+    def email_user(self, subject, message, from_email=None):
+        send_mail(subject, message, from_email, [self.email])
+
+    #Nome do objeto
+    def __unicode__(self):
+        return self.username
 
 #Usuário
 ##Ver método para 'custom group'.

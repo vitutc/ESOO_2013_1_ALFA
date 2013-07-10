@@ -154,5 +154,8 @@ LOGGING = {
     }
 }
 
+#User model config
+AUTH_USER_MODEL = 'Extintor.Usuario'
+
 # Grapelli config
 GRAPPELLI_ADMIN_TITLE = "Sistema de Gerenciamento de Extintores"
