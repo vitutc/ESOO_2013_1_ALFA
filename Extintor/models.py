@@ -15,10 +15,10 @@ class UnidadeOrganizacional(models.Model):
         verbose_name_plural = "Unidades Organizacionais"
 
     #Atributos
-    nome = models.CharField("nome", max_length=50, unique=True)
+    nome = models.CharField("nome", max_length=50, unique=True , help_text="Nome alfanumérico de até 50 caracteres.")
     descricao = models.CharField("descrição", max_length=100)
     responsavel = models.CharField("responsável", max_length=50, blank=True)
-    telefone = models.DecimalField("telefone", max_digits=15, decimal_places=0, blank=True)
+    telefone = models.DecimalField("telefone", max_digits=15, decimal_places=0, blank=True, help_text="Até 15 digitos numéricos.")
     anotacoes = models.TextField("anotações", max_length=500, blank=True)
 
     #Nome do objeto
@@ -40,16 +40,19 @@ class Localizacao(models.Model):
     )
 
     #Atributos
-    unidade = models.ForeignKey('UnidadeOrganizacional', on_delete=models.PROTECT)
-    codigo = models.CharField("código", max_length=10, unique=True)
-    nome = models.CharField("nome", max_length=50, unique=True)
+    unidade = models.ForeignKey('UnidadeOrganizacional', on_delete=models.PROTECT,
+                                help_text="Unidade Organizacional a que pertence")
+    codigo = models.CharField("código", max_length=10, unique=True, help_text="Até 10 caracteres alfanuméricos.")
+    nome = models.CharField("nome", max_length=50, unique=True, help_text="Até 50 caracteres alfanuméricos.")
     descricao = models.CharField("descrição", max_length=100)
-    telefone = models.DecimalField("telefone", max_digits=15, decimal_places=0, blank=True)
-    bloco = models.CharField("bloco", max_length=10)
+    telefone = models.DecimalField("telefone", max_digits=15, decimal_places=0, blank=True,
+                                   help_text="Até 15 digitos númericos.")
+    bloco = models.CharField("bloco", max_length=10, help_text="Bloco onde se encontra. Até 10 digitos alfanuméricos.")
     tipo = models.CharField("tipo", max_length=10, choices=TIPO)
-    numero = models.CharField("número", max_length=10, blank=True)
+    numero = models.CharField("número", max_length=10, blank=True, help_text="Até 10 digitos alfanuméricos.")
     andar = models.DecimalField("andar", max_digits=2, decimal_places=0)
-    risco = models.DecimalField("risco", max_digits=1, decimal_places=0, blank=True)
+    risco = models.DecimalField("risco", max_digits=1, decimal_places=0, blank=True,
+                                help_text="Único número indicando análise de risco.")
     anotacoes = models.TextField("anotações", max_length=500, blank=True)
 
     #Nome do objeto
@@ -71,9 +74,11 @@ class TipoDeExtintor(models.Model):
     )
 
     #Atributos
-    codigo = models.CharField("código", max_length=10, unique=True)
+    codigo = models.CharField("código", max_length=10, unique=True,
+                              help_text="Identificador de tipo de até 10 caracteres alfanuméricos.")
     descricao = models.CharField("descrição", max_length=50)
-    unidade = models.CharField("unidade de medida da capacidade", max_length=10, choices=MEDIDA)
+    unidade = models.CharField("unidade de medida da capacidade", max_length=10, choices=MEDIDA,
+                               help_text="Unidade de medida do conteúdo do extintor")
 
     #Nome do objeto
     def __unicode__(self):
@@ -94,13 +99,16 @@ class Extintor(models.Model):
     )
 
     #Atributos
-    carcaca = models.CharField("número da carcaça", max_length=10, blank=True, unique=True)
-    codigo = models.DecimalField("código interno", max_digits=4, decimal_places=0, unique=True)
+    carcaca = models.CharField("número da carcaça", max_length=10, blank=True, unique=True,
+                               help_text="Até 10 digitos númericos.")
+    codigo = models.DecimalField("código interno", max_digits=4, decimal_places=0, unique=True,
+                                 help_text="Exatamente 4 digitos númericos.")
     tipo = models.ForeignKey('TipoDeExtintor', on_delete=models.PROTECT)
-    capacidade = models.DecimalField("capacidade", max_digits=6, decimal_places=3)
+    capacidade = models.DecimalField("capacidade", max_digits=6, decimal_places=3,
+                                     help_text="Até 6 digitos númericos.")
     localizacao = models.ForeignKey('Localizacao', on_delete=models.PROTECT)
     uso = models.CharField("descrição", max_length=20, choices=USO)
-    troca = models.BooleanField("troca de peças")
+    troca = models.BooleanField("troca de peças", help_text="Se houve troca ou não.")
     data_fabricacao = models.DateField("data de fabricação", blank=True)
     data_recarga = models.DateField("data da última recarga", blank=True)
     data_reteste = models.DateField("data do último reteste", blank=True)
@@ -150,8 +158,10 @@ class ExtintorEmprestado(models.Model):
     extintor = models.OneToOneField('Extintor', related_name='emprestado', on_delete=models.PROTECT)
     inicio = models.DateField("data do empréstimo")
     devolucao = models.DateField("data para devolução", blank=True)
-    responsavel = models.CharField("responsável", max_length=50)
-    telefone = models.DecimalField("telefone", max_digits=15, decimal_places=0, blank=True)
+    responsavel = models.CharField("responsável", max_length=50,
+                                   help_text="Responsável pelos extintores emprestados.")
+    telefone = models.DecimalField("telefone", max_digits=15, decimal_places=0, blank=True,
+                                   help_text="Até 15 digitos numéricos.")
     comentarios = models.TextField("comentários", max_length=250, blank=True)
 
     #Nome do objeto
@@ -190,7 +200,8 @@ class Recarga(models.Model):
         verbose_name_plural = "operações de recarga"
 
     #Atributos
-    identificador = models.CharField("identificador", max_length=50, blank=True)
+    identificador = models.CharField("identificador", max_length=50, blank=True,
+                                     help_text="Identificador de até 50 caracteres alfanuméricos.")
     extintores = models.ManyToManyField('Extintor', related_name='recarga', limit_choices_to={'recarga_necessaria__isnull': False})
     data_saida = models.DateField("data de saída")
     observacoes = models.TextField("observações", max_length=250, blank=True)
@@ -207,9 +218,12 @@ class RecargaConcluida(models.Model):
         verbose_name_plural = "operações de recarga concluídas"
 
     #Atributos
-    recarga = models.OneToOneField('Recarga', related_name='recarga_concluida', on_delete=models.PROTECT)
-    reteste = models.ManyToManyField('Extintor', related_name='reteste+')
-    perdas = models.ManyToManyField('Extintor', related_name='perdas+')
+    recarga = models.OneToOneField('Recarga', related_name='recarga_concluida', on_delete=models.PROTECT,
+                                   help_text="Extintores que foram recarregados.")
+    reteste = models.ManyToManyField('Extintor', related_name='reteste+',
+                                     help_text="Extintores que foram retestados.")
+    perdas = models.ManyToManyField('Extintor', related_name='perdas+',
+                                    help_text="Extintores que foram desativados.")
     data_chegada = models.DateField("data de chegada")
     observacoes = models.TextField("observações", max_length=250, blank=True)
 
@@ -231,10 +245,14 @@ class Substituicao(models.Model):
     identificador = models.CharField("identificador", max_length=50, blank=True)
     data = models.DateField("data")
     motivo = models.CharField("motivo", max_length=50)
-    origem = models.ForeignKey('Localizacao', related_name='substituicao_origem')
-    destino = models.ForeignKey('Localizacao', related_name='substituicao_destino')
-    extintores = models.ManyToManyField('Extintor', related_name='substituicao')
-    cobertura = models.ManyToManyField('Extintor', related_name='cobertura')
+    origem = models.ForeignKey('Localizacao', related_name='substituicao_origem',
+                               help_text="Localização de origem.")
+    destino = models.ForeignKey('Localizacao', related_name='substituicao_destino',
+                                help_text="Localização de destino.")
+    extintores = models.ManyToManyField('Extintor', related_name='substituicao',
+                                        help_text="Extintores substituidos.")
+    cobertura = models.ManyToManyField('Extintor', related_name='cobertura',
+                                       help_text="Extintores de cobertura utilizados.")
     observacoes = models.TextField("observações", max_length=250, blank=True)
 
     #Nome do objeto
