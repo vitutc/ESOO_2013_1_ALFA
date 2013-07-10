@@ -274,6 +274,7 @@ class RecargaConcluida(models.Model):
                                    help_text="Extintores que foram recarregados.")
     reteste = models.ManyToManyField('Extintor', related_name='reteste+', help_text="Extintores que foram retestados.", blank=True)
     perdas = models.ManyToManyField('Extintor', related_name='perdas+', help_text="Extintores que foram desativados.", blank=True)
+    trocas = models.ManyToManyField('Extintor', related_name='trocas+', help_text="Extintores que sofreram troca de peças.", blank=True)
     data_chegada = models.DateField("data de chegada")
     observacoes = models.TextField("observações", max_length=250, blank=True)
 

@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.admin import DateFieldListFilter
 from django.forms import TextInput
 from django.contrib.sites.models import Site
+from django.forms import CheckboxSelectMultiple
 
 from django.db import transaction
 from django.conf import settings
@@ -165,6 +166,22 @@ class RecargaAdmin(admin.ModelAdmin):
             return 'Em andamento.'
     get_data_conclusao.short_description = 'Data de chegada'
 
+    #Overrides
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+    }
+
+
+class SubstituicaoAdmin(admin.ModelAdmin):
+    # Criterios de busca:
+    #   Identificador da Substituição
+    #   Extintores Contidos na Substituição: Uso, Codigo da Carcaca, Tipo de Extintor, Nome da Localizacao do Extintor
+
+    search_fields = ['identificador', 'extintores__uso', 'extintores__carcaca', 'extintores__tipo__codigo', 'origem__nome', 'destino__nome']
+
+    #Exibição de lista
+    list_display = ['identificador', 'data', 'origem', 'destino']
+    list_filter = [('data', DateFieldListFilter)]
 
 class GrupoAdmin(admin.ModelAdmin):
     search_fields = ('name', 'descricao')
@@ -329,6 +346,7 @@ admin.site.register(UnidadeOrganizacional, UnidadeOrganizacionalAdmin)
 admin.site.register(Localizacao, LocalizacaoAdmin)
 admin.site.register(TipoDeExtintor, TipoDeExtintorAdmin)
 admin.site.register(Recarga, RecargaAdmin)
+admin.site.register(Substituicao, SubstituicaoAdmin)
 admin.site.register(Usuario, UsuarioAdmin)
 admin.site.register(Grupo, GrupoAdmin)
 
