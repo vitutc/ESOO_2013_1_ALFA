@@ -1,6 +1,8 @@
 # coding=utf-8
 import re
 
+from datetime import timedelta
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group
 from django.utils import timezone
@@ -272,9 +274,9 @@ class RecargaConcluida(models.Model):
     #Atributos
     recarga = models.OneToOneField('Recarga', related_name='recarga_concluida', on_delete=models.PROTECT,
                                    help_text="Extintores que foram recarregados.")
-    reteste = models.ManyToManyField('Extintor', related_name='reteste+', help_text="Extintores que foram retestados.", blank=True)
-    perdas = models.ManyToManyField('Extintor', related_name='perdas+', help_text="Extintores que foram desativados.", blank=True)
-    trocas = models.ManyToManyField('Extintor', related_name='trocas+', help_text="Extintores que sofreram troca de peças.", blank=True)
+    reteste = models.ManyToManyField('Extintor', related_name='reteste+', help_text="Extintores que foram retestados.", limit_choices_to={'recarga_necessaria__isnull': False}, blank=True)
+    perdas = models.ManyToManyField('Extintor', related_name='perdas+', help_text="Extintores que foram desativados.", limit_choices_to={'recarga_necessaria__isnull': False}, blank=True)
+    trocas = models.ManyToManyField('Extintor', related_name='trocas+', help_text="Extintores que sofreram troca de peças.", limit_choices_to={'recarga_necessaria__isnull': False}, blank=True)
     data_chegada = models.DateField("data de chegada")
     observacoes = models.TextField("observações", max_length=250, blank=True)
 
@@ -282,7 +284,28 @@ class RecargaConcluida(models.Model):
     def __unicode__(self):
         return self.recarga.identificador
 
-    #Incluir método save para mudar estados e datas
+    def save(self, *args, **kwargs):
+        super(RecargaConcluida, self).save(*args, **kwargs)
+
+        for ex in self.recarga.extintores.all():
+            ex.data_recarga = self.data_chegada
+            ex.validade_recarga = ex.validade_reteste + timedelta(days=365)
+            ex.save()
+            ExtintorRecargaNecessaria.objects.filter(extintor=ex).delete()
+
+        for ex in self.recarga.recarga_concluida.reteste.all():
+            ex.data_reteste = self.data_chegada
+            ex.validade_reteste = ex.validade_reteste + timedelta(days=365*5)
+            ex.save()
+
+        for ex in self.recarga.recarga_concluida.perdas.all():
+            ex_perda = ExtintorInativo.objects.create(data=self.data_chegada, motivo='REPROVADO_RETESTE', extintor=ex)
+            ex_perda.save()
+
+        for ex in self.recarga.recarga_concluida.trocas.all():
+            ex.troca = True
+            ex.save()
+
     #Modificar formulário para restringir opções de reteste e perda de acordo com o conjunto original
 
 #Substituição

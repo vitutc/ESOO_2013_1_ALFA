@@ -56,6 +56,7 @@ class RecargaConcluidaInline(admin.StackedInline):
     verbose_name_plural = 'Informar conclusão de recarga'
     inline_classes = ('grp-collapse grp-open')
 
+
 class ExtintorAdmin(admin.ModelAdmin):
     inlines = [ExtintorRecargaNecessariaInline, ExtintorEmprestadoInline, ExtintorInativoInline]
     # Criterios de busca:
