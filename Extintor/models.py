@@ -2,7 +2,7 @@
 import re
 
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, Group
 from django.utils import timezone
 from django.core import validators
 from django.core.mail import send_mail
@@ -50,8 +50,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __unicode__(self):
         return self.username
 
-#Usuário
-##Ver método para 'custom group'.
+#Grupo
+descricao = models.CharField("descrição", max_length=100, blank=True)
+descricao.contribute_to_class(Group, 'descricao')
+
+class Grupo(Group):
+    class Meta:
+        proxy = True
+
 
 #Unidade organizacional
 class UnidadeOrganizacional(models.Model):
@@ -62,7 +68,7 @@ class UnidadeOrganizacional(models.Model):
 
     #Atributos
     nome = models.CharField("nome", max_length=50, unique=True , help_text="Nome alfanumérico de até 50 caracteres.")
-    descricao = models.CharField("descrição", max_length=100)
+    descricao = models.CharField("descrição", max_length=100, blank=True)
     responsavel = models.CharField("responsável", max_length=50, blank=True)
     telefone = models.DecimalField("telefone", max_digits=15, decimal_places=0, blank=True, help_text="Até 15 digitos numéricos.")
     anotacoes = models.TextField("anotações", max_length=500, blank=True)
